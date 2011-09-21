@@ -37,5 +37,15 @@ namespace NCron.Service
         /// Stops the scheduling service.
         /// </summary>
         void Stop();
+
+        /// <summary>
+        /// Indicates that a job has started.
+        /// </summary>
+        event EventHandler<JobEventArgs> JobStarted;
+
+        /// <summary>
+        /// Indicates that a job has finished.
+        /// </summary>
+        event EventHandler<JobEventArgs> JobFinished;
     }
 }

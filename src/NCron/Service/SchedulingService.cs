@@ -33,6 +33,16 @@ namespace NCron.Service
         private ScheduledJob _head;
 
         /// <summary>
+        /// Indicates that a job has started.
+        /// </summary>
+        public event EventHandler<JobEventArgs> JobStarted;
+
+        /// <summary>
+        /// Indicates that a job has finished.
+        /// </summary>
+        public event EventHandler<JobEventArgs> JobFinished;
+
+        /// <summary>
         /// Sets the log factory that is used to create a log for each job execution.
         /// </summary>
         public ILogFactory LogFactory
@@ -128,13 +138,33 @@ namespace NCron.Service
                 try
                 {
                     job.Initialize(context);
+                    InvokeJobStarted(new JobEventArgs(job));
                     job.Execute();
+                    InvokeJobFinished(new JobEventArgs(job));
                 }
                 catch (Exception exception)
                 {
                     log.Error(() => String.Format("The job \"{0}\" threw an unhandled exception.", job),
                               () => exception);
                 }
+            }
+        }
+
+        protected void InvokeJobStarted(JobEventArgs e)
+        {
+            var handler = JobStarted;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
+        protected void InvokeJobFinished(JobEventArgs e)
+        {
+            var handler = JobFinished;
+            if (handler != null)
+            {
+                handler(this, e);
             }
         }
 
